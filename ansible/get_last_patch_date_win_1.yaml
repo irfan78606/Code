@@ -1,0 +1,19 @@
+- name: "get last patch installed on windows server"
+  gather_facts: true
+  hosts: localhost
+  tasks:
+    - name: "get last patch installed on {{ inventory_hostname }}"
+      win_updates:
+        state: latest
+        first: 1
+      register: win_patch_info
+      
+    - name: "display last patch installed date of server {{ inventory_hostname }}"
+      debug:
+        msg: "last patch was installed on {{ inventory_hostname }} date is {{ win_patch_info.updates[0].installation_date }}"
+        
+    - name: "save last patch installed date information to local file"
+      copy:
+        content: |
+          {{ inventory_hostname }},{{ win_patch_info.updates[0].installation_date }}
+        dest: /var/tmmp/win_last_patch_{{ ansible_date_time.date }}.csv

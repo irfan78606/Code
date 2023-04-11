@@ -1,0 +1,19 @@
+- name: "get disk information of windows server"
+  gather_facts: true
+  hosts: localhost
+  tasks:
+    - name: "get disk information of {{ inventory_hostname }}
+      win_disk_facts:
+        exclude_filters:
+          - 'System Reserved'
+          - 'CD-ROM'
+      register: disk_info
+    
+    - name: "save disk information to local file"
+      copy:
+        content: |
+          {% for disk in disk_info.mounts %}
+          {{ inventory_hostname }},{{ disk.filesystem }},{{ disk.percent }},{{ disk.size / 1024 / 1024 / 1024) | round(2) }} GB, {{ disk.free / 1024 / 1024 / 1024) | round(2) }}GB,{{ disk.used / 1024 / 1024 / 1024) | round(2) }} GB
+          {% endfor %}
+        dest: "/var/tmp/windows_disk_information_{{ ansible_date_time.date }}.csv"
+      delegate_to: localhost
