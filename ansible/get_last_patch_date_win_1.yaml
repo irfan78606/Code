@@ -17,3 +17,4 @@
         content: |
           {{ inventory_hostname }},{{ win_patch_info.updates[0].installation_date }}
         dest: /var/tmmp/win_last_patch_{{ ansible_date_time.date }}.csv
+      delegate_to: localhost
